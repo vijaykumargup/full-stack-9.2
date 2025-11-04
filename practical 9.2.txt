@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>CI/CD GitHub Actions Download Workflow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+body{
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  margin:20px;
+  background:#f6f8fb;
+}
+.card{
+  max-width:900px;
+  margin:0 auto;
+  background:white;
+  padding:18px;
+  border-radius:10px;
+  box-shadow:0 0 10px rgba(0,0,0,0.08);
+}
+h1{margin:0 0 8px; font-size:20px; color:#0b66c3}
+pre{
+  background:#0b1220;
+  color:#e6eef8;
+  padding:12px;
+  border-radius:8px;
+  overflow:auto;
+  font-family:Menlo, monospace;
+  font-size:13px;
+}
+.row{
+  display:flex; gap:12px; align-items:center;
+}
+.btn{
+  background:#0ea5e9;
+  border:0;
+  color:white;
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:14px;
+}
+.meta{font-size:14px;color:#475569;margin-bottom:12px}
+.note{
+  background:#f1f5f9;
+  padding:10px;
+  border-radius:8px;
+  color:#0f172a;
+  margin-top:12px
+}
+footer{margin-top:14px;color:#64748b; font-size:13px}
+code{background:#eef2ff;padding:2px 4px; border-radius:4px}
+</style>
+</head>
+<body>
+
+<div class="card">
+<h1>CI/CD Pipeline GitHub Actions Workflow</h1>
+
+<div class="meta">
+<strong>Repository:</strong> <code>ci-cd-github-actions-node</code><br>
+<strong>Description:</strong> Automated CI/CD pipeline using GitHub Actions for Node.
+</div>
+
+<div class="row" style="margin-bottom:8px;">
+<div style="flex:1">
+<div style="font-weight:600">.github/workflows/main.yml</div>
+<div style="font-size:13px;color:#475569">
+Trigger on pushes to <code>main</code>, install, test, build, deploy
+</div>
+</div>
+<button class="btn" onclick="downloadFile('main.yml', workflowYml)">Download YAML</button>
+</div>
+
+<pre id="workflowPreview"></pre>
+
+<div class="note">
+<strong>How to use:</strong>
+<ol>
+<li>Download file → save to <code>.github/workflows/main.yml</code></li>
+<li>Commit & push:</li>
+<pre>git add .github/workflows/main.yml  
+git commit -m "Add CI/CD workflow"
+git push origin main</pre>
+<li>Go to GitHub → <strong>Actions</strong> tab</li>
+</ol>
+</div>
+
+<footer>
+Need versions for Netlify / AWS S3 deployment? Ask me.
+</footer>
+</div>
+
+<script>
+const workflowYml = `name: Node CI/CD Pipeline
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build project
+        run: npm run build
+
+      # Optional Netlify deploy (uncomment to use)
+      # - name: Netlify Deploy
+      #   run: netlify deploy --dir=./build --site=\${{ secrets.NETLIFY_SITE_ID }} --auth=\${{ secrets.NETLIFY_AUTH_TOKEN }}
+
+      # Optional AWS S3 Deploy (uncomment to use)
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v2
+      #   with:
+      #     aws-access-key-id: \${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: \${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: \${{ secrets.AWS_REGION }}
+
+      # - name: Sync build to S3
+      #   run: aws s3 sync build/ s3://your-bucket-name
+`;
+
+document.getElementById('workflowPreview').textContent = workflowYml;
+
+function downloadFile(filename, content) {
+  const blob = new Blob([content], {type: 'text/yaml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
